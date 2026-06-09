@@ -69,7 +69,7 @@
         justify-content: center;
         background: var(--bg);
         transition: opacity 0.6s;
-        padding: 24px;
+        padding: 40px 24px;
       }
       #pw-screen.hidden {
         opacity: 0;
@@ -81,17 +81,17 @@
         background: var(--white);
         border: 1px solid var(--border);
         border-radius: 24px;
-        padding: 48px 40px;
+        padding: 40px 40px 32px;
         width: 100%;
         max-width: 420px;
         text-align: center;
         box-shadow: 0 32px 80px rgba(10, 37, 64, 0.12);
       }
       .pw-logo {
-        height: 56px;
+        height: 48px;
         width: auto;
         display: block;
-        margin: 0 auto 20px;
+        margin: 0 auto 12px;
         mix-blend-mode: multiply;
         filter: contrast(1.1);
         object-fit: contain;
@@ -101,7 +101,7 @@
         font-weight: 600;
         letter-spacing: 0.2em;
         color: var(--muted);
-        margin-bottom: 32px;
+        margin-bottom: 20px;
         text-transform: uppercase;
       }
       .pw-title {
@@ -110,22 +110,22 @@
         font-weight: 400;
         color: var(--navy);
         line-height: 1.1;
-        margin-bottom: 10px;
+        margin-bottom: 6px;
       }
       .pw-copy {
         font-size: 14px;
         line-height: 1.65;
         color: var(--muted);
-        margin-bottom: 24px;
+        margin-bottom: 16px;
       }
       .pw-tabs {
         display: inline-flex;
         width: 100%;
         gap: 8px;
         background: var(--bg);
-        padding: 6px;
+        padding: 5px;
         border-radius: 14px;
-        margin-bottom: 20px;
+        margin-bottom: 14px;
       }
       .pw-tab {
         flex: 1;
@@ -156,7 +156,7 @@
         color: var(--muted);
         text-transform: uppercase;
         display: block;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
         text-align: left;
       }
       .pw-input {
@@ -164,12 +164,12 @@
         background: var(--bg);
         border: 1.5px solid var(--border);
         border-radius: 12px;
-        padding: 14px 16px;
+        padding: 12px 16px;
         color: var(--text);
         font-family: var(--sans);
         font-size: 15px;
         outline: none;
-        margin-bottom: 14px;
+        margin-bottom: 10px;
         transition:
           border-color 0.2s,
           box-shadow 0.2s;
@@ -187,7 +187,7 @@
         background: var(--navy);
         border: none;
         border-radius: 12px;
-        padding: 15px;
+        padding: 13px;
         color: var(--white);
         font-family: var(--sans);
         font-size: 14px;
@@ -198,7 +198,7 @@
         transition:
           transform 0.2s,
           box-shadow 0.2s;
-        min-height: 52px;
+        min-height: 48px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -231,13 +231,13 @@
       .pw-err {
         font-size: 13px;
         color: var(--red);
-        margin-top: 10px;
+        margin-top: 8px;
         min-height: 18px;
         font-weight: 500;
         text-align: left;
       }
       .pw-footer {
-        margin-top: 16px;
+        margin-top: 10px;
         font-size: 13px;
         line-height: 1.55;
         color: var(--muted);
@@ -1612,7 +1612,7 @@
           padding: 40px 20px;
         }
         .pw-box {
-          padding: 36px 24px;
+          padding: 28px 18px 24px;
         }
         .intro-box {
           padding: 32px 16px;
@@ -1674,18 +1674,18 @@
         </div>
         <div class="pw-tabs" role="tablist" aria-label="Authentication mode">
           <button
-            class="pw-tab active"
+            class="pw-tab"
             id="auth-login-tab"
             type="button"
-            aria-selected="true"
+            aria-selected="false"
           >
             Log in
           </button>
           <button
-            class="pw-tab"
+            class="pw-tab active"
             id="auth-signup-tab"
             type="button"
-            aria-selected="false"
+            aria-selected="true"
           >
             Create account
           </button>
@@ -1706,10 +1706,10 @@
           class="pw-input"
           id="auth-password"
           placeholder="••••••••••••"
-          autocomplete="current-password"
+          autocomplete="new-password"
           aria-describedby="pw-err"
         />
-        <div id="auth-confirm-wrap" style="display: none">
+        <div id="auth-confirm-wrap">
           <label class="pw-label" for="auth-confirm">Confirm Password</label>
           <input
             type="password"
@@ -1720,7 +1720,7 @@
           />
         </div>
         <button class="pw-btn" id="pw-btn">
-          <span id="pw-btn-text">Log in</span>
+          <span id="pw-btn-text">Create account</span>
           <span class="pw-spinner" id="pw-spinner" aria-hidden="true"></span>
         </button>
         <div
@@ -1731,9 +1731,9 @@
         ></div>
         <div class="pw-footer">
           <span id="auth-footer-copy"
-            >New here? Create an account to start fresh onboarding.</span
+            >Already have an account? Log in.</span
           >
-          <button type="button" id="auth-switch-btn">Create account</button>
+          <button type="button" id="auth-switch-btn">Log in</button>
         </div>
       </div>
     </div>
@@ -2500,7 +2500,7 @@
         var PROGRESS_SYNC_INTERVAL_MS = 45000;
         var authAttempts = 0;
         var authLockedUntil = 0;
-        var authMode = "login";
+        var authMode = "signup";
         var currentUsername = "";
         var currentAccount = null;
         var saveTimer = null;
@@ -4023,7 +4023,7 @@
         // ── INIT ──
         introScreen.style.opacity = "0";
         applyVideoPlaceholderVisibility();
-        setAuthMode("login");
+        setAuthMode("signup");
         if (!restoreSavedSession()) {
           pwScreen.classList.remove("hidden");
           pwScreen.style.opacity = "1";
