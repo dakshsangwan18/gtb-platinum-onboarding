@@ -1832,7 +1832,7 @@
                 A short personal message from Vivaan covering what to expect,
                 how we work, and what makes GTB different.
               </div>
-              <!-- Step 2 video placeholder hidden for now
+              Step 2 video placeholder hidden for now
               <div
                 class="video-wrapper"
                 id="video-trigger"
@@ -1840,21 +1840,37 @@
                 role="button"
                 aria-label="Click to watch intro video"
               >
-                <div style="text-align: center; z-index: 1">
-                  <div class="video-play-icon">
-                    <svg viewBox="0 0 24 24">
-                      <polygon points="5 3 19 12 5 21 5 3" />
-                    </svg>
-                  </div>
-                  <div class="video-note" style="margin-top: 12px">
-                    Click to watch intro
+                <iframe
+                  id="step2-youtube"
+                  width="100%"
+                  height="100%"
+                  src="https://www.youtube.com/embed/4kuZuZNTqAQ?enablejsapi=1&rel=0&modestbranding=1"
+                  title="GTB Intro Video"
+                  frameborder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowfullscreen
+                  style="position: absolute; inset: 0; width: 100%; height: 100%; border: none; border-radius: 16px;"
+                ></iframe>
+                <div
+                  id="video-overlay"
+                  style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 2; cursor: pointer; background: rgba(10, 37, 64, 0.35); border-radius: 16px; transition: opacity 0.4s;"
+                >
+                  <div style="text-align: center;">
+                    <div class="video-play-icon">
+                      <svg viewBox="0 0 24 24">
+                        <polygon points="5 3 19 12 5 21 5 3" />
+                      </svg>
+                    </div>
+                    <div class="video-note" style="margin-top: 12px">
+                      Click to watch intro
+                    </div>
                   </div>
                 </div>
               </div>
               <div class="video-watched" id="video-watched">
                 ✓ &nbsp;Video watched
               </div>
-              -->
+             
             </div>
 
             <!-- STEP 3 -->
@@ -2492,7 +2508,7 @@
         var clTotal = 7;
         var INTRO_WATCH_SECONDS = 15;
         var PHASE4_WATCH_SECONDS = 15;
-        var HIDE_STEP2_VIDEO_PLACEHOLDER = true;
+        var HIDE_STEP2_VIDEO_PLACEHOLDER = false;
         var HIDE_PHASE4_VIDEO_PLACEHOLDER = true;
         var MAX_AUTH_ATTEMPTS = 5;
         var PROGRESS_SYNC_INTERVAL_MS = 45000;
@@ -2997,6 +3013,8 @@
         var clientNameInput = $("client-name");
         var clientBrandInput = $("client-brand");
         var videoTrigger = $("video-trigger");
+        var videoOverlay = $("video-overlay");
+        var step2Youtube = $("step2-youtube");
         var videoWatchedEl = $("video-watched");
         var phase4VideoWrap = $("phase4-video-wrap");
         var phase4VideoTrigger = $("phase4-video-trigger");
@@ -3594,16 +3612,81 @@
           queueSaveProgress();
         }
 
-        setupWatchGate({
-          trigger: videoTrigger,
-          requiredSeconds: INTRO_WATCH_SECONDS,
-          idleLabel: "Click to start intro watch",
-          completeLabel: "Intro watch complete",
-          isComplete: function () {
-            return state.videoWatched;
-          },
-          onComplete: markVideoWatched,
-        });
+        // ── YOUTUBE IFRAME API ──
+        var ytPlayer = null;
+        var ytReady = false;
+
+        function loadYouTubeAPI(callback) {
+          if (window.YT && window.YT.Player) {
+            callback();
+            return;
+          }
+          var tag = document.createElement("script");
+          tag.src = "https://www.youtube.com/iframe_api";
+          var firstScript = document.getElementsByTagName("script")[0];
+          firstScript.parentNode.insertBefore(tag, firstScript);
+          window.onYouTubeIframeAPIReady = function () {
+            callback();
+          };
+        }
+
+        function initYouTubePlayer() {
+          if (!step2Youtube) return;
+          ytPlayer = new window.YT.Player(step2Youtube, {
+            events: {
+              onReady: function () {
+                ytReady = true;
+              },
+              onStateChange: function (e) {
+                if (e.data === window.YT.PlayerState.PLAYING && !state.videoWatched) {
+                  startIntroWatchTimer();
+                }
+              },
+            },
+          });
+        }
+
+        var introWatchStarted = false;
+        var introWatchInterval = null;
+        var introWatchRemaining = INTRO_WATCH_SECONDS;
+
+        function startIntroWatchTimer() {
+          if (introWatchStarted || state.videoWatched) return;
+          introWatchStarted = true;
+          var noteEl = videoTrigger ? videoTrigger.querySelector(".video-note") : null;
+
+          introWatchInterval = setInterval(function () {
+            if (document.hidden) {
+              if (noteEl) noteEl.textContent = "Paused — keep this tab active";
+              return;
+            }
+            introWatchRemaining -= 1;
+            if (noteEl) noteEl.textContent = "Watching... " + introWatchRemaining + "s remaining";
+            if (introWatchRemaining <= 0) {
+              clearInterval(introWatchInterval);
+              introWatchInterval = null;
+              markVideoWatched();
+              if (noteEl) noteEl.textContent = "Watched";
+            }
+          }, 1000);
+        }
+
+        if (videoOverlay) {
+          videoOverlay.addEventListener("click", function () {
+            videoOverlay.style.opacity = "0";
+            setTimeout(function () {
+              videoOverlay.style.display = "none";
+            }, 400);
+            if (ytReady && ytPlayer && ytPlayer.playVideo) {
+              ytPlayer.playVideo();
+            } else {
+              // Fallback: start timer anyway if YouTube API hasn't loaded
+              startIntroWatchTimer();
+            }
+          });
+        }
+
+        loadYouTubeAPI(initYouTubePlayer);
 
         setupWatchGate({
           trigger: phase4VideoTrigger,
