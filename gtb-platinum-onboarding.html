@@ -926,6 +926,10 @@
         display: flex;
         align-items: center;
       }
+      .meta-video-heading.single-line {
+        font-size: 13px;
+        white-space: nowrap;
+      }
       .meta-video-player {
         background: #0b0b0b;
         aspect-ratio: 16 / 9;
@@ -938,36 +942,35 @@
         position: relative;
         overflow: hidden;
       }
+      .meta-video-launch {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        z-index: 3;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        background: rgba(10, 37, 64, 0.9);
+        color: #fff;
+        border-radius: 9999px;
+        padding: 10px 14px;
+        font-family: var(--sans);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        cursor: pointer;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(8px);
+        transform: translate(-50%, -50%);
+      }
+      .meta-video-launch:hover {
+        background: rgba(37, 99, 235, 0.96);
+      }
       .meta-video-iframe {
         width: 100%;
         height: 100%;
         border: none;
         display: block;
       }
-      .meta-video-expand {
-        position: absolute;
-        bottom: 12px;
-        right: 12px;
-        background: rgba(255, 255, 255, 0.95);
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        font-size: 18px;
-        transition: all 0.2s ease;
-        z-index: 3;
-      }
-      .meta-video-expand:hover {
-        background: var(--white);
-        border-color: var(--blue);
-        color: var(--blue);
-        transform: scale(1.1);
-      }
-
       /* ── HALF-SCREEN VIDEO PLAYER ── */
       .video-player-panel {
         position: fixed;
@@ -1829,6 +1832,7 @@
                 A short personal message from Vivaan covering what to expect,
                 how we work, and what makes GTB different.
               </div>
+              <!-- Step 2 video placeholder hidden for now
               <div
                 class="video-wrapper"
                 id="video-trigger"
@@ -1850,6 +1854,7 @@
               <div class="video-watched" id="video-watched">
                 ✓ &nbsp;Video watched
               </div>
+              -->
             </div>
 
             <!-- STEP 3 -->
@@ -1955,9 +1960,12 @@
                   </div>
                 </div>
               </div>
+              <!-- Step 3 flip counter hidden for now
               <div class="flip-counter" id="flip-counter">
                 0 of 4 phases explored · Flip Phase 4 to unlock video
               </div>
+              -->
+              <!-- Step 3 Phase 4 video placeholder hidden for now
               <div class="phase4-video-wrap" id="phase4-video-wrap">
                 <div
                   class="video-wrapper"
@@ -1984,6 +1992,7 @@
                   <span>Video completed</span>
                 </div>
               </div>
+              -->
             </div>
 
             <!-- STEP 4 -->
@@ -2080,17 +2089,10 @@
                         picture-in-picture;
                       "
                     ></iframe>
-                    <button
-                      class="meta-video-expand"
-                      aria-label="Expand video to half screen"
-                      title="Expand to half screen"
-                    >
-                      ⤢
-                    </button>
                   </div>
                 </div>
                 <div class="meta-video-card">
-                  <div class="meta-video-heading">
+                  <div class="meta-video-heading single-line">
                     Meta Business Manager Setup & Walkthrough
                   </div>
                   <div class="meta-video-player" data-video-index="1">
@@ -2106,13 +2108,6 @@
                         picture-in-picture;
                       "
                     ></iframe>
-                    <button
-                      class="meta-video-expand"
-                      aria-label="Expand video to half screen"
-                      title="Expand to half screen"
-                    >
-                      ⤢
-                    </button>
                   </div>
                 </div>
                 <div class="meta-video-card">
@@ -2130,13 +2125,6 @@
                         picture-in-picture;
                       "
                     ></iframe>
-                    <button
-                      class="meta-video-expand"
-                      aria-label="Expand video to half screen"
-                      title="Expand to half screen"
-                    >
-                      ⤢
-                    </button>
                   </div>
                 </div>
                 <div class="meta-video-card">
@@ -2155,12 +2143,29 @@
                       "
                     ></iframe>
                     <button
-                      class="meta-video-expand"
-                      aria-label="Expand video to half screen"
-                      title="Expand to half screen"
+                      type="button"
+                      class="meta-video-launch"
+                      aria-label="Open the Facebook Ads Account Access document"
                     >
-                      ⤢
+                      Tap to open doc
                     </button>
+                  </div>
+                </div>
+                <div class="meta-video-card">
+                  <div class="meta-video-heading">Instagram PlayBook</div>
+                  <div class="meta-video-player" data-video-index="4">
+                    <iframe
+                      class="meta-video-iframe"
+                      data-video-index="4"
+                      allowfullscreen
+                      allow="
+                        accelerometer;
+                        autoplay;
+                        encrypted-media;
+                        gyroscope;
+                        picture-in-picture;
+                      "
+                    ></iframe>
                   </div>
                 </div>
               </div>
@@ -2487,6 +2492,8 @@
         var clTotal = 7;
         var INTRO_WATCH_SECONDS = 15;
         var PHASE4_WATCH_SECONDS = 15;
+        var HIDE_STEP2_VIDEO_PLACEHOLDER = true;
+        var HIDE_PHASE4_VIDEO_PLACEHOLDER = true;
         var MAX_AUTH_ATTEMPTS = 5;
         var PROGRESS_SYNC_INTERVAL_MS = 45000;
         var authAttempts = 0;
@@ -2499,12 +2506,13 @@
         var lastProgressSyncSignature = "";
         var state = createDefaultState();
 
-        // Loom video URLs for Step 5 meta setup videos
-        var LOOM_VIDEOS = {
+        // Step 5 video sources: supports Loom share links/IDs and Google Drive links.
+        var STEP5_VIDEO_SOURCES = {
           0: "c0bd64c4cf704d2b98fc721533b9735f", // Shopify walkthrough & How to add us
-          1: "", // Meta Business Manager Setup & Walkthrough (awaiting link)
-          2: "", // How to set up your pixel (awaiting link)
-          3: "", // How to add us (awaiting link)
+          1: "https://www.loom.com/share/e4c427819ad64037beef041da7a5836c", // Meta Business Manager Setup & Walkthrough
+          2: "https://www.loom.com/share/e9946655fa0b4578973d8c878300dfa9", // How to set up your pixel
+          3: "https://www.notion.so/Facebook-Ads-Account-Access-GTB-2784bc50c0ba806dba1de1600180b316?source=copy_link", // How to add us
+          4: "https://www.loom.com/share/0683f4c6ca1240a190d3fb463e83b072", // Instagram PlayBook
         };
         var LABELS = [
           "Welcome",
@@ -2542,7 +2550,7 @@
             clientBrand: "",
             videoWatched: false,
             phase4VideoWatched: false,
-            metaWatched: [false, false, false, false],
+            metaWatched: [false, false, false, false, false],
             flipped: [false, false, false, false],
             expectations: [false, false, false, false, false],
             checklist: [false, false, false, false, false, false, false],
@@ -2560,7 +2568,7 @@
           base.clientBrand = source.clientBrand || "";
           base.videoWatched = !!source.videoWatched;
           base.phase4VideoWatched = !!source.phase4VideoWatched;
-          base.metaWatched = normalizeFlags(source.metaWatched, 4);
+          base.metaWatched = normalizeFlags(source.metaWatched, 5);
           base.flipped = normalizeFlags(source.flipped, 4);
           base.expectations = normalizeFlags(source.expectations, 5);
           base.checklist = normalizeFlags(source.checklist, 7);
@@ -3002,6 +3010,20 @@
         var portalBtn = $("portal-btn");
         var phase4VideoWatched = false;
 
+        function applyVideoPlaceholderVisibility() {
+          if (HIDE_STEP2_VIDEO_PLACEHOLDER) {
+            state.videoWatched = true;
+            if (videoTrigger) videoTrigger.style.display = "none";
+            if (videoWatchedEl) videoWatchedEl.style.display = "none";
+          }
+
+          if (HIDE_PHASE4_VIDEO_PLACEHOLDER) {
+            state.phase4VideoWatched = true;
+            if (phase4VideoWrap) phase4VideoWrap.style.display = "none";
+            if (phase4VideoWatchedEl) phase4VideoWatchedEl.style.display = "none";
+          }
+        }
+
         function setAuthMode(mode) {
           authMode = mode === "signup" ? "signup" : "login";
           var isSignup = authMode === "signup";
@@ -3384,10 +3406,12 @@
                   : state.clientBrand) !== "";
               break;
             case 2:
-              ok = state.videoWatched;
+              ok = HIDE_STEP2_VIDEO_PLACEHOLDER || state.videoWatched;
               break;
             case 3:
-              ok = counts.flippedCount >= 4 && state.phase4VideoWatched;
+              ok =
+                counts.flippedCount >= 4 &&
+                (HIDE_PHASE4_VIDEO_PLACEHOLDER || state.phase4VideoWatched);
               break;
             case 4:
               ok = true;
@@ -3598,30 +3622,73 @@
         var panelIframe = $("video-player-iframe");
         var panelTitle = $("video-player-title");
 
-        function getLoomEmbedUrl(loomId, autoplay) {
-          if (!loomId) return "";
-          return (
-            "https://www.loom.com/embed/" +
-            loomId +
-            "?hide_owner=true&hide_share=true&hide_title=true" +
-            (autoplay ? "&autoplay=1" : "")
-          );
+        function extractLoomId(value) {
+          if (!value) return "";
+          var raw = String(value).trim();
+          if (!raw) return "";
+          var idPattern = /^[a-zA-Z0-9]{20,}$/;
+          if (idPattern.test(raw)) return raw;
+          var match = raw.match(/loom\.com\/(?:share|embed)\/([a-zA-Z0-9]+)/i);
+          return match ? match[1] : "";
+        }
+
+        function extractGoogleDriveFileId(value) {
+          if (!value) return "";
+          var raw = String(value).trim();
+          if (!raw) return "";
+          var byPath = raw.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/i);
+          if (byPath) return byPath[1];
+          var byQuery = raw.match(/[?&]id=([a-zA-Z0-9_-]+)/i);
+          if (byQuery) return byQuery[1];
+          return "";
+        }
+
+        function getStep5EmbedUrl(source, autoplay) {
+          if (!source) return "";
+          var loomId = extractLoomId(source);
+          if (loomId) {
+            return (
+              "https://www.loom.com/embed/" +
+              loomId +
+              "?hide_owner=true&hide_share=true&hide_title=true" +
+              (autoplay ? "&autoplay=1" : "")
+            );
+          }
+
+          var driveId = extractGoogleDriveFileId(source);
+          if (driveId) {
+            return "https://drive.google.com/file/d/" + driveId + "/preview";
+          }
+
+          return "";
+        }
+
+        function getStep5ExternalUrl(source) {
+          if (!source) return "";
+          var raw = String(source).trim();
+          if (!raw) return "";
+          if (/^https?:\/\//i.test(raw) && !getStep5EmbedUrl(raw, false)) {
+            return raw;
+          }
+          return "";
         }
 
         function loadVideoInCard(iframe, videoIndex) {
-          var loomId = LOOM_VIDEOS[videoIndex];
-          if (!loomId) return;
-          iframe.src = getLoomEmbedUrl(loomId, true);
+          var source = STEP5_VIDEO_SOURCES[videoIndex];
+          var embedUrl = getStep5EmbedUrl(source, true);
+          if (!embedUrl) return;
+          iframe.src = embedUrl;
         }
 
         function expandToHalfScreen(videoIndex, videoTitle) {
-          var loomId = LOOM_VIDEOS[videoIndex];
-          if (!loomId) {
+          var source = STEP5_VIDEO_SOURCES[videoIndex];
+          var embedUrl = getStep5EmbedUrl(source, true);
+          if (!embedUrl) {
             alert("Video not yet available. Check back soon!");
             return;
           }
           panelTitle.textContent = videoTitle;
-          panelIframe.src = getLoomEmbedUrl(loomId, true);
+          panelIframe.src = embedUrl;
           videoPanel.classList.add("show");
           document.body.style.overflow = "hidden";
         }
@@ -3645,12 +3712,11 @@
           .forEach(function (card, index) {
             var player = card.querySelector(".meta-video-player");
             var iframe = card.querySelector(".meta-video-iframe");
-            var expandBtn = card.querySelector(".meta-video-expand");
             var heading = card.querySelector(".meta-video-heading");
             var videoWatched = false;
 
             if (player && iframe) {
-              var loomId = LOOM_VIDEOS[index];
+              var source = STEP5_VIDEO_SOURCES[index];
               var iframeHover = false;
               var suppressBlurMark = false;
 
@@ -3663,15 +3729,29 @@
 
               player.setAttribute("tabindex", "0");
 
-              if (loomId) {
+              if (source) {
                 // Keep preview visible in-card before click.
-                iframe.src = getLoomEmbedUrl(loomId, false);
+                var previewUrl = getStep5EmbedUrl(source, false);
+                var externalUrl = getStep5ExternalUrl(source);
+                if (previewUrl) {
+                  iframe.src = previewUrl;
+                } else if (externalUrl) {
+                  iframe.style.pointerEvents = "none";
+                  iframe.style.background = "transparent";
+                }
                 iframe.setAttribute("title", heading.textContent + " video");
               }
 
               player.addEventListener("click", function () {
-                if (!loomId) {
+                var embedUrl = getStep5EmbedUrl(source, false);
+                var externalUrl = getStep5ExternalUrl(source);
+                if (!embedUrl && !externalUrl) {
                   alert("Video not yet available. Check back soon!");
+                  return;
+                }
+                if (externalUrl) {
+                  markMetaVideoWatched();
+                  window.location.href = externalUrl;
                   return;
                 }
                 loadVideoInCard(iframe, index);
@@ -3680,12 +3760,12 @@
 
               // Capture direct interaction on the iframe (play button clicks inside embed).
               iframe.addEventListener("pointerdown", function () {
-                if (!loomId) return;
+                if (!getStep5EmbedUrl(source, false)) return;
                 markMetaVideoWatched();
               });
 
               iframe.addEventListener("focus", function () {
-                if (!loomId) return;
+                if (!getStep5EmbedUrl(source, false)) return;
                 markMetaVideoWatched();
               });
 
@@ -3700,31 +3780,24 @@
               });
 
               window.addEventListener("blur", function () {
-                if (!loomId || suppressBlurMark) return;
+                if (!getStep5EmbedUrl(source, false) || suppressBlurMark) return;
                 if (iframeHover) {
                   markMetaVideoWatched();
                 }
               });
 
-              expandBtn.addEventListener("click", function (e) {
-                e.stopPropagation();
-                if (!loomId) {
-                  alert("Video not yet available. Check back soon!");
-                  return;
-                }
-                suppressBlurMark = true;
-                expandToHalfScreen(index, heading.textContent);
-                markMetaVideoWatched();
-                setTimeout(function () {
-                  suppressBlurMark = false;
-                }, 300);
-              });
-
               player.addEventListener("keydown", function (e) {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
-                  if (!loomId) {
+                  var embedUrl = getStep5EmbedUrl(source, false);
+                  var externalUrl = getStep5ExternalUrl(source);
+                  if (!embedUrl && !externalUrl) {
                     alert("Video not yet available. Check back soon!");
+                    return;
+                  }
+                  if (externalUrl) {
+                    markMetaVideoWatched();
+                    window.location.href = externalUrl;
                     return;
                   }
                   loadVideoInCard(iframe, index);
@@ -3896,6 +3969,7 @@
 
         // ── INIT ──
         introScreen.style.opacity = "0";
+        applyVideoPlaceholderVisibility();
         setAuthMode("login");
         if (!restoreSavedSession()) {
           pwScreen.classList.remove("hidden");
